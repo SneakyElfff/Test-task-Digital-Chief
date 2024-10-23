@@ -1,4 +1,4 @@
-package org.example.elasticdatasearcher.entities;
+package org.example.elasticdatasearcher.models;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,4 +17,24 @@ public class Product {
     private String category;
     private String description;
     private LocalDateTime created = LocalDateTime.now();
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public LocalDateTime getCreated() {
+        return created;
+    }
 }
