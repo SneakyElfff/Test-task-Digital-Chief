@@ -36,4 +36,5 @@
 
 Открыть браузер и в поисковой строке ввести URL:
 
+    http://localhost:8080/load-data
     localhost:8080/search-products
