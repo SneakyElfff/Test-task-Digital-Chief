@@ -6,6 +6,7 @@ import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import jakarta.annotation.PostConstruct;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.elasticdatasearcher.models.Product;
@@ -34,6 +35,11 @@ public class LoadingDataServiceImpl implements LoadingDataService {
 
     @Autowired
     private ElasticsearchClient elasticsearchClient;
+
+    @PostConstruct
+    public void init() throws IOException {
+        loadDataToElastic();
+    }
 
     public void loadDataToElastic() throws IOException {
         if (!elasticsearchClient.indices().exists(e -> e.index("market_index")).value()) {
@@ -66,19 +72,27 @@ public class LoadingDataServiceImpl implements LoadingDataService {
                 return skuData;
             }).toList());
 
-            IndexRequest<Map<String, Object>> request = IndexRequest.of(i -> i
+            boolean exists = elasticsearchClient.exists(e -> e
                     .index("market_index")
                     .id(product.getId().toString())
-                    .document(document)
-            );
+            ).value();
 
-            IndexResponse response = elasticsearchClient.index(request);
+            if (!exists) {
+                IndexRequest<Map<String, Object>> request = IndexRequest.of(i -> i
+                        .index("market_index")
+                        .id(product.getId().toString())
+                        .document(document)
+                );
 
-            log.info("Загружен документ {}", response.id());
+                IndexResponse response = elasticsearchClient.index(request);
+                log.info("Загружен новый документ: {}", response.id());
+            } else {
+                log.info("Документ с id={} уже существует", product.getId());
+            }
         }
     }
 
-    public List<Map<String, Object>> filterProducts(String category,Double minPrice, Double maxPrice) throws IOException {
+    public List<Map<String, Object>> filterProducts(String category, Double minPrice, Double maxPrice) throws IOException {
         SearchRequest searchRequest = SearchRequest.of(s -> s
                 .index("market_index")
                 .query(q -> q
@@ -87,20 +101,6 @@ public class LoadingDataServiceImpl implements LoadingDataService {
                                         .term(t -> t
                                                 .field("product_category.keyword")
                                                 .value(category)
-                                        )
-                                )
-                                .must(m -> m
-                                        .nested(n -> n
-                                                .path("skus")
-                                                .query(nq -> nq
-                                                        .range(r -> r
-                                                                .number(nm -> nm
-                                                                        .field("skus.sku_price")
-                                                                        .gte(minPrice)
-                                                                        .lte(maxPrice)
-                                                                )
-                                                        )
-                                                )
                                         )
                                 )
                         )
