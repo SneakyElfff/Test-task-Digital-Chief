@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <style>
+        body {
+            font-family: "Times New Roman", sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fff;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .product-item {
+            border-bottom: 1px solid #f4f4f4;
+            padding: 20px 0;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        ul.sku-list {
+            margin-top: 10px;
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        li.sku-item {
+            margin-bottom: 10px;
+        }
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            padding: 10px;
+            background-color: #1dc6d8;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        a:hover {
+            background-color: #259397;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Search results for "<span th:text="${keyword}"></span>"</h1>
+    <ul>
+        <li th:each="result : ${results}" class="product-item">
+            <strong>Product:</strong> <span th:text="${result['product_name']}"></span><br>
+            <strong>Category:</strong> <span th:text="${result['product_category']}"></span><br>
+            <strong>Description:</strong> <span th:text="${result['product_description']}"></span><br>
+            <strong>Created:</strong> <span th:text="${result['product_created']}"></span><br>
+            <strong>SKUs:</strong>
+            <ul class="sku-list">
+                <li th:each="sku : ${result['skus']}" class="sku-item">
+                    SKU Code: <span th:text="${sku['sku_code']}"></span><br>
+                    Price: <span th:text="${sku['sku_price']}"></span><br>
+                    Quantity: <span th:text="${sku['sku_quantity']}"></span><br>
+                    Weight: <span th:text="${sku['sku_weight']}"></span><br>
+                    Created: <span th:text="${sku['sku_created']}"></span><br>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <a th:href="@{/search-products}">Back to search</a>
+</div>
+</body>
+</html>

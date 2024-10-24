@@ -36,6 +36,11 @@ public class LoadingDataServiceImpl implements LoadingDataService {
     private ElasticsearchClient elasticsearchClient;
 
     public void loadDataToElastic() throws IOException {
+        if (!elasticsearchClient.indices().exists(e -> e.index("market_index")).value()) {
+            elasticsearchClient.indices().create(c -> c.index("market_index"));
+            log.info("Индекс 'market_index' создан.");
+        }
+
         List<Product> products = prodRepo.findAll();
 
         for (Product product : products) {
@@ -47,7 +52,7 @@ public class LoadingDataServiceImpl implements LoadingDataService {
             document.put("product_name", product.getName());
             document.put("product_category", product.getCategory());
             document.put("product_description", product.getDescription());
-            document.put("product_created", product.getCreated());
+            document.put("product_created", product.getCreated().toString());
 
             document.put("skus", skus.stream().map(sku -> {
                 Map<String, Object> skuData = new HashMap<>();
@@ -56,7 +61,7 @@ public class LoadingDataServiceImpl implements LoadingDataService {
                 skuData.put("sku_price", sku.getPrice());
                 skuData.put("sku_quantity", sku.getQuantity());
                 skuData.put("sku_weight", sku.getWeight());
-                skuData.put("sku_created", sku.getCreated());
+                skuData.put("sku_created", sku.getCreated().toString());
 
                 return skuData;
             }).toList());

@@ -1,21 +1,24 @@
 package org.example.elasticdatasearcher.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "products")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name")
     private String name;
+    @Column(name = "category")
     private String category;
+    @Column(name = "description")
     private String description;
+    @Column(name = "created")
     private LocalDateTime created = LocalDateTime.now();
 
     public Long getId() {
