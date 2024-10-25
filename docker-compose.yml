@@ -8,7 +8,8 @@ services:
             POSTGRES_DB: market
         volumes:
         - postgres_data:/var/lib/postgresql/data
-        - ./market_dump.sql:/docker-entrypoint-initdb.d/market_dump.sql
+        - ./1-schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+        - ./2-data.sql:/docker-entrypoint-initdb.d/2-data.sql
         ports:
         - "5433:5432"
 
